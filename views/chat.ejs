@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgoBot - AI Learning Companion</title>
+    <link rel="icon" href="https://www.candyicons.com/style-image-examples/abstract-uYcg0JhhxK7bQ54KOtzsLX9U.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Color palette - Gold theme */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #0f0f0f;
+            --gold-primary: #fbbf24;
+            --gold-secondary: #f59e0b;
+            --gold-tertiary: #d97706;
+            --gold-accent: #fef3c7;
+            --text-primary: #ffffff;
+            --text-secondary: #a3a3a3;
+            --text-muted: #525252;
+            --border: #262626;
+            --border-light: #404040;
+            
+            /* Gradients */
+            --gradient-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+            --gradient-bg: linear-gradient(135deg, #0a0a0a 0%, #111111 50%, #1a1a1a 100%);
+            --gradient-card: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-gold: 0 0 40px rgba(251, 191, 36, 0.15);
+            
+            /* Animation */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .background-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            opacity: 0.03;
+            background-image: 
+                linear-gradient(rgba(251, 191, 36, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(251, 191, 36, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .floating-shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .shape-1 { 
+            top: 20%; 
+            left: 10%; 
+            animation-delay: 0s;
+            animation-duration: 12s;
+        }
+        .shape-2 { 
+            top: 60%; 
+            left: 80%; 
+            animation-delay: 2s;
+            animation-duration: 14s;
+        }
+        .shape-3 { 
+            top: 80%; 
+            left: 20%; 
+            animation-delay: 4s;
+            animation-duration: 16s;
+        }
+        .shape-4 { 
+            top: 30%; 
+            right: 10%; 
+            animation-delay: 6s;
+            animation-duration: 18s;
+        }
+
+        @keyframes float {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg) scale(1);
+                opacity: 0.05;
+            }
+            50% { 
+                transform: translateY(-30px) rotate(180deg) scale(1.1);
+                opacity: 0.15;
+            }
+        }
+
+        /* Main Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--gradient-card);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-gold);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-gold);
+            animation: brandPulse 3s infinite ease-in-out;
+        }
+
+        @keyframes brandPulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: var(--shadow-gold);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 60px rgba(251, 191, 36, 0.25);
+            }
+        }
+
+        .brand-text h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Stats Cards */
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: var(--gold-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-gold);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gold-primary);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        /* Topics Section */
+        .topics {
+            flex: 1;
+        }
+
+        .topics-header {
+            margin-bottom: 20px;
+        }
+
+        .topics-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .topics-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .topic-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 8px;
+            border: 1px solid transparent;
+        }
+
+        .topic-item:hover {
+            background: var(--bg-secondary);
+            border-color: var(--border-light);
+            transform: translateX(4px);
+        }
+
+        .topic-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .topic-item:hover .topic-icon {
+            background: var(--gradient-gold);
+            border-color: var(--gold-secondary);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .topic-info h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .topic-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+        }
+
+        .chat-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-card);
+        }
+
+        .chat-info h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .chat-info p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            animation: statusPulse 2s infinite ease-in-out;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        /* Messages */
+        .messages {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 20px 24px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            position: relative;
+            animation: messageIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .message-user {
+            align-self: flex-end;
+            background: var(--gradient-gold);
+            color: var(--bg-primary);
+            border-bottom-right-radius: 6px;
+            font-weight: 500;
+            box-shadow: var(--shadow-gold);
+        }
+
+        .message-bot {
+            align-self: flex-start;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 6px;
+            color: var(--text-primary);
+        }
+
+        .message-bot code {
+            background: var(--bg-tertiary);
+            color: var(--gold-primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+        }
+
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .typing-indicator {
+            align-self: flex-start;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            border-bottom-left-radius: 6px;
+            padding: 20px 24px;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gold-primary);
+            animation: typingPulse 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingPulse {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* Welcome Message */
+        .welcome {
+            text-align: center;
+            padding: 60px 40px;
+            border: 1px dashed var(--border);
+            border-radius: 20px;
+            background: var(--bg-card);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .welcome-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 24px;
+            background: var(--gradient-gold);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-gold);
+        }
+
+        .welcome h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .welcome p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 24px 32px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 16px;
+            align-items: flex-end;
+            max-width: 1000px;
+            position: relative;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .message-input {
+            width: 100%;
+            min-height: 56px;
+            max-height: 160px;
+            padding: 18px 20px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .message-input:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+        }
+
+        .message-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .send-button {
+            width: 56px;
+            height: 56px;
+            border: none;
+            border-radius: 16px;
+            background: var(--gradient-gold);
+            color: var(--bg-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+            box-shadow: var(--shadow-gold);
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 50px rgba(251, 191, 36, 0.3);
+        }
+
+        .send-button:active:not(:disabled) {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Responsive Design */
+        
+        /* Mobile Phones (6.1" - 6.5") - 375px to 414px */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+                height: 100vh;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 40vh;
+                padding: 16px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                overflow-y: auto;
+                gap: 20px;
+            }
+            
+            .brand {
+                padding-bottom: 16px;
+                gap: 12px;
+            }
+            
+            .brand-icon {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .brand-text h1 {
+                font-size: 20px;
+            }
+            
+            .stats {
+                gap: 12px;
+            }
+            
+            .stat-card {
+                padding: 16px 12px;
+            }
+            
+            .stat-number {
+                font-size: 24px;
+            }
+            
+            .topics {
+                display: none;
+            }
+            
+            .chat-area {
+                flex: 1;
+                min-height: 0;
+            }
+            
+            .chat-header {
+                padding: 16px 20px;
+            }
+            
+            .chat-info h2 {
+                font-size: 18px;
+            }
+            
+            .messages {
+                padding: 20px 16px;
+                gap: 16px;
+            }
+            
+            .message {
+                max-width: 90%;
+                padding: 16px 20px;
+                font-size: 14px;
+            }
+            
+            .welcome {
+                padding: 40px 20px;
+            }
+            
+            .welcome-icon {
+                width: 48px;
+                height: 48px;
+                margin-bottom: 16px;
+            }
+            
+            .welcome h3 {
+                font-size: 20px;
+            }
+            
+            .welcome p {
+                font-size: 14px;
+            }
+            
+            .input-area {
+                padding: 16px 20px;
+            }
+            
+            .input-container {
+                gap: 12px;
+            }
+            
+            .message-input {
+                min-height: 48px;
+                padding: 14px 16px;
+                font-size: 14px;
+                border-radius: 14px;
+            }
+            
+            .send-button {
+                width: 48px;
+                height: 48px;
+                border-radius: 14px;
+            }
+        }
+        
+        /* Small Mobile (6.1" and smaller) */
+        @media (max-width: 375px) {
+            .sidebar {
+                padding: 12px;
+                max-height: 35vh;
+            }
+            
+            .brand-text h1 {
+                font-size: 18px;
+            }
+            
+            .stat-card {
+                padding: 12px 8px;
+            }
+            
+            .stat-number {
+                font-size: 20px;
+            }
+            
+            .messages {
+                padding: 16px 12px;
+            }
+            
+            .welcome {
+                padding: 30px 16px;
+            }
+            
+            .input-area {
+                padding: 12px 16px;
+            }
+        }
+        
+        /* Tablets (768px to 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar {
+                width: 280px;
+                padding: 20px;
+                gap: 28px;
+            }
+            
+            .brand-icon {
+                width: 44px;
+                height: 44px;
+            }
+            
+            .brand-text h1 {
+                font-size: 22px;
+            }
+            
+            .stat-card {
+                padding: 18px;
+            }
+            
+            .topic-item {
+                padding: 14px;
+            }
+            
+            .topic-icon {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .chat-header {
+                padding: 20px 28px;
+            }
+            
+            .messages {
+                padding: 28px;
+                gap: 20px;
+            }
+            
+            .message {
+                max-width: 80%;
+                padding: 18px 22px;
+            }
+            
+            .input-area {
+                padding: 20px 28px;
+            }
+            
+            .message-input {
+                min-height: 52px;
+                padding: 16px 18px;
+            }
+            
+            .send-button {
+                width: 52px;
+                height: 52px;
+            }
+        }
+        
+        /* Large Screens (14" laptops and above) */
+        @media (min-width: 1400px) {
+            .app-container {
+                max-width: 1800px;
+            }
+            
+            .sidebar {
+                width: 360px;
+                padding: 28px;
+            }
+            
+            .brand-icon {
+                width: 52px;
+                height: 52px;
+            }
+            
+            .brand-text h1 {
+                font-size: 26px;
+            }
+            
+            .stat-card {
+                padding: 24px;
+            }
+            
+            .stat-number {
+                font-size: 32px;
+            }
+            
+            .topic-item {
+                padding: 18px;
+            }
+            
+            .topic-icon {
+                width: 44px;
+                height: 44px;
+            }
+            
+            .chat-header {
+                padding: 28px 36px;
+            }
+            
+            .chat-info h2 {
+                font-size: 22px;
+            }
+            
+            .messages {
+                padding: 36px;
+                gap: 28px;
+            }
+            
+            .message {
+                padding: 22px 26px;
+                font-size: 16px;
+            }
+            
+            .welcome {
+                padding: 70px 50px;
+            }
+            
+            .welcome-icon {
+                width: 72px;
+                height: 72px;
+            }
+            
+            .welcome h3 {
+                font-size: 28px;
+            }
+            
+            .welcome p {
+                font-size: 18px;
+            }
+            
+            .input-area {
+                padding: 28px 36px;
+            }
+            
+            .message-input {
+                min-height: 60px;
+                padding: 20px 24px;
+                font-size: 16px;
+            }
+            
+            .send-button {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-light);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="background-grid"></div>
+    
+    <div class="floating-elements">
+        <div class="floating-shape shape-1">
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="60" height="60" rx="12" fill="url(#grad1)"/>
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#fbbf24"/>
+                        <stop offset="100%" style="stop-color:#d97706"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+        <div class="floating-shape shape-2">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="40" cy="40" r="40" fill="url(#grad2)"/>
+                <defs>
+                    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#f59e0b"/>
+                        <stop offset="100%" style="stop-color:#fbbf24"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+        <div class="floating-shape shape-3">
+            <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="25,5 45,40 5,40" fill="url(#grad3)"/>
+                <defs>
+                    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#d97706"/>
+                        <stop offset="100%" style="stop-color:#f59e0b"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+        <div class="floating-shape shape-4">
+            <svg width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M35 5 L55 25 L45 45 L25 45 L15 25 Z" fill="url(#grad4)"/>
+                <defs>
+                    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#fbbf24"/>
+                        <stop offset="100%" style="stop-color:#d97706"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L22 8.5V15.5L12 22L2 15.5V8.5L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M12 8V16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M8 10L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>AlgoBot</h1>
+                    <p>AI Learning Companion</p>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="questionsCount">0</div>
+                    <div class="stat-label">Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="topicsCount">0</div>
+                    <div class="stat-label">Topics</div>
+                </div>
+            </div>
+            
+            <div class="topics">
+                <div class="topics-header">
+                    <div class="topics-title">Quick Start Topics</div>
+                    <div class="topics-subtitle">Click any topic to begin learning</div>
+                </div>
+                
+                <div class="topic-item" onclick="askTopic('arrays and their operations')">
+                    <div class="topic-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="6" width="18" height="12" rx="2" stroke="#fbbf24" stroke-width="2"/>
+                            <path d="M7 10h4M7 14h6M15 10h2M15 14h2" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="topic-info">
+                        <h3>Arrays</h3>
+                        <p>Linear data structures & operations</p>
+                    </div>
+                </div>
+                
+                <div class="topic-item" onclick="askTopic('linked lists implementation and types')">
+                    <div class="topic-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="6" cy="12" r="3" stroke="#fbbf24" stroke-width="2"/>
+                            <circle cx="18" cy="12" r="3" stroke="#fbbf24" stroke-width="2"/>
+                            <path d="M9 12h6" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M15 12l-2-2M15 12l-2 2" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="topic-info">
+                        <h3>Linked Lists</h3>
+                        <p>Dynamic memory allocation & pointers</p>
+                    </div>
+                </div>
+                
+                <div class="topic-item" onclick="askTopic('stack data structure and applications')">
+                    <div class="topic-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="6" y="16" width="12" height="3" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="6" y="12" width="12" height="3" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="6" y="8" width="12" height="3" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="6" y="4" width="12" height="3" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="topic-info">
+                        <h3>Stacks</h3>
+                        <p>LIFO principle & function calls</p>
+                    </div>
+                </div>
+                
+                <div class="topic-item" onclick="askTopic('queue data structure and variations')">
+                    <div class="topic-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="9" width="4" height="6" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="7" y="9" width="4" height="6" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="12" y="9" width="4" height="6" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="17" y="9" width="4" height="6" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                            <path d="M2 12h-1M22 12h1" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="topic-info">
+                        <h3>Queues</h3>
+                        <p>FIFO principle & scheduling</p>
+                    </div>
+                </div>
+                
+                <div class="topic-item" onclick="askTopic('binary trees and tree traversal')">
+                    <div class="topic-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="6" r="2" stroke="#fbbf24" stroke-width="2"/>
+                            <circle cx="8" cy="14" r="2" stroke="#fbbf24" stroke-width="2"/>
+                            <circle cx="16" cy="14" r="2" stroke="#fbbf24" stroke-width="2"/>
+                            <circle cx="5" cy="20" r="1.5" stroke="#fbbf24" stroke-width="2"/>
+                            <circle cx="11" cy="20" r="1.5" stroke="#fbbf24" stroke-width="2"/>
+                            <path d="M12 8L8 12M12 8L16 12M8 16L5 18.5M8 16L11 18.5" stroke="#fbbf24" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="topic-info">
+                        <h3>Trees</h3>
+                        <p>Hierarchical structures & traversals</p>
+                    </div>
+                </div>
+                
+                <div class="topic-item" onclick="askTopic('graphs representation and algorithms')">
+                    <div class="topic-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="6" cy="6" r="2" stroke="#fbbf24" stroke-width="2"/>
+                            <circle cx="18" cy="6" r="2" stroke="#fbbf24" stroke-width="2"/>
+                            <circle cx="6" cy="18" r="2" stroke="#fbbf24" stroke-width="2"/>
+                            <circle cx="18" cy="18" r="2" stroke="#fbbf24" stroke-width="2"/>
+                            <path d="M8 6h8M8 8l8 8M16 8l-8 8M6 8v8M18 8v8" stroke="#fbbf24" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="topic-info">
+                        <h3>Graphs</h3>
+                        <p>Networks & connectivity algorithms</p>
+                    </div>
+                </div>
+                
+                <div class="topic-item" onclick="askTopic('sorting algorithms comparison')">
+                    <div class="topic-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="4" y="16" width="2" height="4" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="8" y="12" width="2" height="8" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="12" y="8" width="2" height="12" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="16" y="4" width="2" height="16" stroke="#fbbf24" stroke-width="2"/>
+                            <path d="M3 21h18" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="topic-info">
+                        <h3>Sorting</h3>
+                        <p>Ordering algorithms & complexity</p>
+                    </div>
+                </div>
+                
+                <div class="topic-item" onclick="askTopic('searching algorithms and optimization')">
+                    <div class="topic-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="10" cy="10" r="7" stroke="#fbbf24" stroke-width="2"/>
+                            <path d="m21 21-4.35-4.35" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="10" cy="10" r="3" stroke="#fbbf24" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="topic-info">
+                        <h3>Searching</h3>
+                        <p>Find algorithms & optimization</p>
+                    </div>
+                </div>
+                
+                <div class="topic-item" onclick="askTopic('hash tables and collision handling')">
+                    <div class="topic-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="7" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1" stroke="#fbbf24" stroke-width="2"/>
+                            <path d="M6.5 6.5h1M17.5 6.5h1M6.5 17.5h1M17.5 17.5h1" stroke="#fbbf24" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="topic-info">
+                        <h3>Hashing</h3>
+                        <p>Fast lookups & collision resolution</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="chat-info">
+                    <h2>DSA Learning Session</h2>
+                    <p>Interactive algorithmic problem solving</p>
+                </div>
+                <div class="status">
+                    <div class="status-dot"></div>
+                    <span>AI Active</span>
+                </div>
+            </div>
+            
+            <div class="messages" id="messagesContainer">
+                <div class="welcome">
+                    <div class="welcome-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386L9.663 17z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>Welcome to AlgoBot</h3>
+                    <p>I'm your AI-powered Data Structures & Algorithms instructor. Ask me anything about algorithms, data structures, time complexity, or coding problems. Let's explore the fascinating world of computer science together!</p>
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <div class="input-container">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="messageInput" 
+                            class="message-input" 
+                            placeholder="Ask me about algorithms, data structures, complexity analysis..."
+                            rows="1"
+                        ></textarea>
+                    </div>
+                    <button id="sendButton" class="send-button">
+                        <svg id="sendIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const messagesContainer = document.getElementById('messagesContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const sendIcon = document.getElementById('sendIcon');
+        const questionsCount = document.getElementById('questionsCount');
+        const topicsCount = document.getElementById('topicsCount');
+
+        // State
+        let isLoading = false;
+        let messageCount = 0;
+        let topicSet = new Set();
+        let hasInteracted = false;
+
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 160) + 'px';
+        });
+
+        // Remove welcome message on interaction
+        messageInput.addEventListener('focus', () => {
+            if (!hasInteracted) {
+                const welcomeMsg = document.querySelector('.welcome');
+                if (welcomeMsg) {
+                    welcomeMsg.style.opacity = '0.6';
+                    welcomeMsg.style.transform = 'scale(0.98)';
+                }
+                hasInteracted = true;
+            }
+        });
+
+        function addMessage(content, isUser = false) {
+            // Remove welcome message after first user message
+            if (isUser && hasInteracted) {
+                const welcomeMsg = document.querySelector('.welcome');
+                if (welcomeMsg) {
+                    welcomeMsg.remove();
+                }
+                hasInteracted = false;
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'message-user' : 'message-bot'}`;
+            
+            // Enhanced message content processing
+            if (!isUser) {
+                // Process code blocks and inline code
+                content = content.replace(/`([^`]+)`/g, '<code>$1</code>');
+                messageDiv.innerHTML = content;
+                
+                // Update stats
+                messageCount++;
+                questionsCount.textContent = messageCount;
+                
+                // Extract topics from responses
+                const dsaTopics = [
+                    'array', 'linked', 'stack', 'queue', 'tree', 'graph', 'sort', 'search', 
+                    'hash', 'heap', 'trie', 'dfs', 'bfs', 'binary', 'recursion', 'dynamic',
+                    'greedy', 'backtrack', 'divide', 'conquer', 'complexity', 'big o'
+                ];
+                
+                dsaTopics.forEach(topic => {
+                    if (content.toLowerCase().includes(topic)) {
+                        topicSet.add(topic);
+                    }
+                });
+                topicsCount.textContent = topicSet.size;
+            } else {
+                messageDiv.textContent = content;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function updateSendButton(loading = false) {
+            if (loading) {
+                sendButton.disabled = true;
+                sendIcon.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 12a9 9 0 11-6.219-8.56" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                `;
+                sendIcon.style.animation = 'spin 1s linear infinite';
+            } else {
+                sendButton.disabled = false;
+                sendIcon.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                `;
+                sendIcon.style.animation = 'none';
+            }
+        }
+
+        // Add spin animation for loading state
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        async function sendMessage() {
+    const message = messageInput.value.trim();
+    if (!message || isLoading) return;
+
+    addMessage(message, true);
+    messageInput.value = '';
+    messageInput.style.height = 'auto';
+
+    isLoading = true;
+    updateSendButton(true);
+    showTypingIndicator();
+
+    try {
+        // Call backend API
+        const res = await fetch('/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
+        });
+
+        const data = await res.json();
+
+        hideTypingIndicator();
+
+        if (data.success) {
+            addMessage(data.response); // backend AI response
+        } else {
+            addMessage('⚠️ Error: ' + data.error);
+        }
+    } catch (error) {
+        hideTypingIndicator();
+        addMessage('⚠️ Server error. Please try again.');
+        console.error('Error:', error);
+    }
+
+    isLoading = false;
+    updateSendButton(false);
+}
+
+
+        function generateDSAResponse(message) {
+            const msg = message.toLowerCase();
+            
+            // Simple response generation based on keywords
+            if (msg.includes('array')) {
+                return `Arrays are fundamental linear data structures that store elements in contiguous memory locations. Key operations include:
+
+• **Access**: O(1) time complexity - direct indexing
+• **Search**: O(n) for unsorted, O(log n) for sorted arrays
+• **Insertion/Deletion**: O(n) in worst case due to shifting
+
+**Common array algorithms**:
+- Two pointers technique
+- Sliding window approach
+- Binary search on sorted arrays
+
+Would you like me to explain any specific array operation or algorithm in detail?`;
+            }
+            
+            if (msg.includes('linked') || msg.includes('list')) {
+                return `Linked Lists are dynamic data structures where elements (nodes) are connected via pointers. Each node contains data and a reference to the next node.
+
+**Types**:
+• **Singly Linked**: One direction traversal
+• **Doubly Linked**: Bidirectional with prev/next pointers  
+• **Circular Linked**: Last node points to first
+
+**Advantages**: Dynamic size, efficient insertion/deletion at beginning (O(1))
+**Disadvantages**: No random access, extra memory for pointers
+
+**Key operations**: Insert, Delete, Search, Traverse
+
+Which aspect of linked lists would you like to explore further?`;
+            }
+            
+            if (msg.includes('stack')) {
+                return `Stacks follow the **LIFO (Last In, First Out)** principle. Think of it like a stack of plates - you can only add or remove from the top.
+
+**Core Operations**:
+• \`push()\`: Add element to top - O(1)
+• \`pop()\`: Remove top element - O(1)
+• \`peek()/top()\`: View top element - O(1)
+• \`isEmpty()\`: Check if stack is empty - O(1)
+
+**Applications**:
+- Function call management
+- Expression evaluation & conversion
+- Undo operations
+- Browser history
+- Depth-First Search (DFS)
+
+**Implementation**: Arrays or Linked Lists
+
+Want to see a specific stack algorithm or implementation?`;
+            }
+            
+            if (msg.includes('queue')) {
+                return `Queues implement **FIFO (First In, First Out)** principle. Like a line at a store - first person in line is served first.
+
+**Core Operations**:
+• \`enqueue()\`: Add to rear - O(1)
+• \`dequeue()\`: Remove from front - O(1)
+• \`front()\`: View front element - O(1)
+• \`rear()\`: View rear element - O(1)
+
+**Types**:
+- **Simple Queue**: Basic FIFO structure
+- **Circular Queue**: Efficient space utilization
+- **Priority Queue**: Elements have priorities
+- **Deque**: Double-ended queue
+
+**Applications**: Process scheduling, BFS, handling requests
+
+Which queue variant interests you most?`;
+            }
+            
+            if (msg.includes('tree') || msg.includes('binary')) {
+                return `Trees are hierarchical data structures with a root node and subtrees. Binary trees have at most 2 children per node.
+
+**Tree Terminology**:
+• **Root**: Top node
+• **Leaf**: Node with no children  
+• **Height**: Longest path from root to leaf
+• **Depth**: Distance from root to a node
+
+**Binary Tree Traversals**:
+• **Inorder**: Left → Root → Right
+• **Preorder**: Root → Left → Right  
+• **Postorder**: Left → Right → Root
+• **Level Order**: Breadth-first traversal
+
+**Special Trees**: BST, AVL, Red-Black, Heap
+
+**Applications**: File systems, expression parsing, database indexing
+
+Which tree concept would you like me to elaborate on?`;
+            }
+            
+            if (msg.includes('graph')) {
+                return `Graphs represent relationships between entities using vertices (nodes) and edges (connections).
+
+**Types**:
+• **Directed**: Edges have direction (one-way)
+• **Undirected**: Edges are bidirectional
+• **Weighted**: Edges have associated costs
+• **Unweighted**: All edges equal weight
+
+**Representation**:
+- **Adjacency Matrix**: 2D array, O(V²) space
+- **Adjacency List**: Array of lists, O(V+E) space
+
+**Key Algorithms**:
+• **DFS**: Depth-first search using stack
+• **BFS**: Breadth-first search using queue
+• **Dijkstra**: Shortest path in weighted graphs
+• **Topological Sort**: Ordering in DAGs
+
+**Applications**: Social networks, maps, dependency resolution
+
+What specific graph algorithm interests you?`;
+            }
+            
+            if (msg.includes('sort')) {
+                return `Sorting algorithms arrange elements in a specific order (ascending/descending).
+
+**Comparison-based Sorts**:
+• **Bubble Sort**: O(n²) - Simple but inefficient
+• **Selection Sort**: O(n²) - Finds min/max repeatedly
+• **Insertion Sort**: O(n²) - Good for small/nearly sorted data
+• **Merge Sort**: O(n log n) - Divide & conquer, stable
+• **Quick Sort**: O(n log n) avg, O(n²) worst - In-place
+• **Heap Sort**: O(n log n) - Uses heap data structure
+
+**Non-comparison Sorts**:
+• **Counting Sort**: O(n+k) for limited range
+• **Radix Sort**: O(d×n) for integers
+• **Bucket Sort**: O(n) avg for uniform distribution
+
+**Key factors**: Time complexity, space complexity, stability
+
+Which sorting algorithm would you like to dive deeper into?`;
+            }
+            
+            if (msg.includes('search')) {
+                return `Searching algorithms find specific elements within data structures.
+
+**Linear Search**: 
+- Checks each element sequentially
+- Time: O(n), Space: O(1)
+- Works on unsorted data
+
+**Binary Search**:
+- Divides sorted array in half repeatedly  
+- Time: O(log n), Space: O(1)
+- Requires sorted data
+
+**Advanced Search**:
+• **Interpolation Search**: Better than binary for uniform data
+• **Exponential Search**: Finds range then binary search
+• **Jump Search**: Jumps by √n steps
+• **Ternary Search**: Divides into 3 parts
+
+**Hash-based Search**: O(1) average using hash tables
+
+**Tree Search**: DFS/BFS for tree structures
+
+**Applications**: Database queries, web search, AI pathfinding
+
+Which search technique would you like to explore in detail?`;
+            }
+            
+            if (msg.includes('complexity') || msg.includes('big o')) {
+                return `Big O notation describes algorithm efficiency as input size grows.
+
+**Common Complexities** (best to worst):
+• **O(1)**: Constant - array access, hash lookup
+• **O(log n)**: Logarithmic - binary search, balanced tree ops
+• **O(n)**: Linear - linear search, single loop
+• **O(n log n)**: Linearithmic - efficient sorting (merge, heap)
+• **O(n²)**: Quadratic - nested loops, bubble sort
+• **O(n³)**: Cubic - triple nested loops
+• **O(2ⁿ)**: Exponential - recursive Fibonacci
+• **O(n!)**: Factorial - permutation generation
+
+**Space Complexity**: Memory usage analysis
+**Best/Average/Worst Case**: Different scenarios
+
+**Analysis Tips**:
+- Focus on fastest-growing term
+- Ignore constants and lower-order terms
+- Consider both time and space trade-offs
+
+Want me to analyze the complexity of a specific algorithm?`;
+            }
+            
+            // Default response for general questions
+            return `Great question! I'd be happy to help you understand this DSA concept better.
+
+Here are some ways I can assist you:
+• **Explain algorithms** step-by-step with examples
+• **Analyze time/space complexity** of different approaches  
+• **Compare different data structures** for specific use cases
+• **Provide coding solutions** with detailed explanations
+• **Suggest practice problems** to reinforce learning
+
+Could you be more specific about what aspect you'd like to explore? For example:
+- Implementation details
+- Real-world applications  
+- Optimization techniques
+- Problem-solving strategies
+
+I'm here to make DSA concepts clear and intuitive for you!`;
+        }
+
+        function askTopic(topic) {
+            messageInput.value = `Explain ${topic} with examples and applications`;
+            messageInput.focus();
+            // Auto-send after a short delay for better UX
+            setTimeout(() => {
+                if (messageInput.value.trim()) {
+                    sendMessage();
+                }
+            }, 300);
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Focus input on load
+        window.addEventListener('load', () => {
+            messageInput.focus();
+        });
+
+        // Add some initial animation
+        window.addEventListener('load', () => {
+            const elements = document.querySelectorAll('.topic-item, .stat-card');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
